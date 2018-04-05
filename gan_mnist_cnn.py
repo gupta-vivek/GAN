@@ -210,9 +210,9 @@ with tf.Session() as sess:
             _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={z: batch_z})
 
         if i % 100 == 0:
-            print("\nEpoch - ".format(i))
-            print("Discriminator Loss - ".format(d_loss))
-            print("Generator Loss - ".format(g_loss))
+            print("\nEpoch - {}".format(i))
+            print("Discriminator Loss - {}".format(d_loss))
+            print("Generator Loss - {}".format(g_loss))
 
         if i % 1000 == 0:
             batch_z = sample_noise(batch_size, z_dim)
