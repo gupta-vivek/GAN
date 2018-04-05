@@ -113,7 +113,7 @@ def generator(z, z_dim):
     # Final convolution with one output channel.
     g4 = tf.nn.conv2d(g3, gen_weights['wc3'], strides=[1, 2, 2, 1], padding='SAME')
     g4 = g4 + gen_biases['bc3']
-    g4 = tf.sigmoid(g4)
+    # g4 = tf.sigmoid(g4)
 
     # Dimensions of g4: batch_size x 28 x 28 x 1
     return g4
@@ -185,7 +185,7 @@ with tf.Session() as sess:
     writer = tf.summary.FileWriter(logdir, sess.graph)
     writer.add_graph(sess.graph)
 
-    # Pre train the discriminator.
+    # Pre train the discriminator on both real and fake images.
     print("Pre training the discriminator...")
     count = 0
     for i in range(300):
@@ -218,6 +218,7 @@ with tf.Session() as sess:
                 sample_output = sess.run(gen_sample, feed_dict={z: batch_z})
 
                 for ind, image in enumerate(sample_output):
+                    image = tf.sigmoid(image)
                     image = image.reshape([28, 28]).astype('uint8')*255
                     img = Image.fromarray(image)
                     img.save('image/' + str(ind) + '.png')
