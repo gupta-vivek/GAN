@@ -13,7 +13,7 @@ import read_data
 import numpy as np
 from PIL import Image
 import datetime
-
+from scipy.special import expit
 
 LOSS_1 = True  # Sigmoid Cross Entropy.
 LOSS_2 = False  # As mentioned in the paper.
@@ -219,7 +219,7 @@ with tf.Session() as sess:
             sample_output = sess.run(gen_sample, feed_dict={z: batch_z})
 
             for ind, image in enumerate(sample_output):
-                image = tf.sigmoid(image)
+                image = expit(image)
                 image = image.reshape([28, 28]).astype('uint8')*255
                 img = Image.fromarray(image)
                 img.save('image/' + str(ind) + '.png')
