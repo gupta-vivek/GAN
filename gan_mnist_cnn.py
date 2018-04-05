@@ -185,44 +185,45 @@ with tf.Session() as sess:
     writer = tf.summary.FileWriter(logdir, sess.graph)
     writer.add_graph(sess.graph)
 
+    g_loss = None
+    d_loss = None
+    data = None
+
     # Pre train the discriminator on both real and fake images.
     print("Pre training the discriminator...")
-    count = 0
-    for i in range(300):
-        count += 1
+    for i in range(10):
         for data in train_data:
             batch_z = sample_noise(batch_size, z_dim)
             _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
 
-            if count % 20 == 0:
-                print("Discriminator Loss - ", d_loss)
+        print("Epoch - {}".format(i))
+        print("Discriminator Loss - {}".format(d_loss))
 
     print("Pre training completed.")
-
     print("Generator training...")
     count = 0
-    for i in range(100000):
+    for i in range(10000):
         count += 1
         for data in train_data:
             batch_z = sample_noise(batch_size, z_dim)
             _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
             _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={z: batch_z})
 
-            if count % 100 == 0:
-                print("\nEpoch - ", count)
-                print("Discriminator Loss - ", d_loss)
-                print("Generator Loss - ", g_loss)
+        if i % 100 == 0:
+            print("\nEpoch - ".format(i))
+            print("Discriminator Loss - ".format(d_loss))
+            print("Generator Loss - ".format(g_loss))
 
-            if count % 1000 == 0:
-                batch_z = sample_noise(batch_size, z_dim)
-                sample_output = sess.run(gen_sample, feed_dict={z: batch_z})
+        if i % 1000 == 0:
+            batch_z = sample_noise(batch_size, z_dim)
+            sample_output = sess.run(gen_sample, feed_dict={z: batch_z})
 
-                for ind, image in enumerate(sample_output):
-                    image = tf.sigmoid(image)
-                    image = image.reshape([28, 28]).astype('uint8')*255
-                    img = Image.fromarray(image)
-                    img.save('image/' + str(ind) + '.png')
+            for ind, image in enumerate(sample_output):
+                image = tf.sigmoid(image)
+                image = image.reshape([28, 28]).astype('uint8')*255
+                img = Image.fromarray(image)
+                img.save('image/' + str(ind) + '.png')
 
-                summary = sess.run(summary_merged, {z: batch_z, x: data})
-                writer.add_summary(summary, i)
-                model_saver.save(sess, 'session/gan_mnist_model', global_step=1000)
+            summary = sess.run(summary_merged, {z: batch_z, x: data})
+            writer.add_summary(summary, i)
+            model_saver.save(sess, 'session/gan_mnist_model', global_step=1000)
