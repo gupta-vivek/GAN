@@ -173,7 +173,7 @@ tf.summary.scalar('Discriminator_loss', disc_loss)
 images_for_tensorboard = generator(z, z_dim)
 tf.summary.image('Generated_images', images_for_tensorboard, 5)
 summary_merged = tf.summary.merge_all()
-logdir = "tensorboard/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+logdir = "tensorboard_cnn/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
 
 # Model saver.
 model_saver = tf.train.Saver()
@@ -225,4 +225,4 @@ with tf.Session() as sess:
 
             summary = sess.run(summary_merged, {z: batch_z, x: data})
             writer.add_summary(summary, i)
-            model_saver.save(sess, 'session/gan_mnist_model', global_step=1000)
+            model_saver.save(sess, 'session/gan_cnn_mnist_model', global_step=1000)
