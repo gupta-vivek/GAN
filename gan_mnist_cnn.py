@@ -150,7 +150,7 @@ if LOSS_1:
     disc_loss_real = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=disc_real, labels=tf.ones_like(disc_real)))
     disc_loss_fake = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=disc_fake, labels=tf.zeros_like(disc_fake)))
     disc_loss = disc_loss_fake + disc_loss_real
-    gen_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=gen_sample, labels=tf.ones_like(gen_sample)))
+    gen_loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=disc_fake, labels=tf.ones_like(disc_fake)))
 
 if LOSS_2:
     disc_loss = -tf.reduce_mean(tf.log(disc_real) + tf.log(1.-disc_fake))
@@ -209,12 +209,11 @@ with tf.Session() as sess:
             _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
             _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={z: batch_z})
 
-        if i % 100 == 0:
+        if i % 10 == 0:
             print("\nEpoch - {}".format(i))
             print("Discriminator Loss - {}".format(d_loss))
             print("Generator Loss - {}".format(g_loss))
 
-        if i % 1000 == 0:
             batch_z = sample_noise(batch_size, z_dim)
             sample_output = sess.run(gen_sample, feed_dict={z: batch_z})
 
