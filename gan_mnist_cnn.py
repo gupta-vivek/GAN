@@ -170,7 +170,7 @@ init = tf.global_variables_initializer()
 tf.summary.scalar('Generator_loss', gen_loss)
 tf.summary.scalar('Discriminator_loss', disc_loss)
 
-images_for_tensorboard = generator(z, z_dim)
+images_for_tensorboard = tf.sigmoid(generator(z, z_dim))
 tf.summary.image('Generated_images', images_for_tensorboard, 5)
 summary_merged = tf.summary.merge_all()
 logdir = "tensorboard_cnn/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
