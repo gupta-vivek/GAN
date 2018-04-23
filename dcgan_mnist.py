@@ -110,44 +110,44 @@ logdir = "tensorboard_dcgan/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S"
 
 # Model saver.
 model_saver = tf.train.Saver()
+with tf.device("/device:GPU:0"):
+    with tf.Session() as sess:
+        sess.run(init)
 
-with tf.Session() as sess:
-    sess.run(init)
+        # Summary Writer.
+        writer = tf.summary.FileWriter(logdir, sess.graph)
+        writer.add_graph(sess.graph)
 
-    # Summary Writer.
-    writer = tf.summary.FileWriter(logdir, sess.graph)
-    writer.add_graph(sess.graph)
+        g_loss = None
+        d_loss = None
+        data = None
 
-    g_loss = None
-    d_loss = None
-    data = None
+        # Pre train the discriminator on both real and fake images.
+        print("Pre training the discriminator...")
+        for i in range(1):
+            for data in train_data:
+                batch_z = sample_noise(batch_size, z_dim)
+                _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
 
-    # Pre train the discriminator on both real and fake images.
-    print("Pre training the discriminator...")
-    for i in range(10):
-        for data in train_data:
-            batch_z = sample_noise(batch_size, z_dim)
-            _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
-
-        print("Epoch - {}".format(i))
-        print("Discriminator Loss - {}".format(d_loss))
-
-    print("Pre training completed.")
-    print("Generator training...")
-    count = 0
-    for i in range(5000):
-        count += 1
-        for data in train_data:
-            batch_z = sample_noise(batch_size, z_dim)
-            _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
-            _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={z: batch_z})
-
-        if i % 20 == 0:
-            print("\nEpoch - {}".format(i))
+            print("Epoch - {}".format(i))
             print("Discriminator Loss - {}".format(d_loss))
-            print("Generator Loss - {}".format(g_loss))
 
-            batch_z = sample_noise(batch_size, z_dim)
-            summary = sess.run(summary_merged, {z: batch_z, x: data})
-            writer.add_summary(summary, i)
-            model_saver.save(sess, 'session/dcgan_cnn_mnist_model', global_step=25)
+        print("Pre training completed.")
+        print("Generator training...")
+        count = 0
+        for i in range(1):
+            count += 1
+            for data in train_data:
+                batch_z = sample_noise(batch_size, z_dim)
+                _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, z: batch_z})
+                _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={z: batch_z})
+
+            if i % 1 == 0:
+                print("\nEpoch - {}".format(i))
+                print("Discriminator Loss - {}".format(d_loss))
+                print("Generator Loss - {}".format(g_loss))
+
+                batch_z = sample_noise(batch_size, z_dim)
+                summary = sess.run(summary_merged, {z: batch_z, x: data})
+                writer.add_summary(summary, i)
+                model_saver.save(sess, 'session/dcgan_cnn_mnist_model', global_step=20)
