@@ -202,7 +202,7 @@ with tf.device("/device:GPU:0"):
 
         # Pre train the discriminator on both real and fake images. This is optional.
         print("Pre training the discriminator...")
-        for i in range(1):
+        for i in range(100):
             for data, label in zip(train_data, train_label):
                 batch_z = sample_noise(batch_size, z_dim)
                 _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, y: label})
@@ -213,14 +213,14 @@ with tf.device("/device:GPU:0"):
         print("Pre training completed.")
         print("Generator training...")
         count = 0
-        for i in range(1):
+        for i in range(10000):
             count += 1
             for data, label in zip(train_data, train_label):
                 # batch_z = sample_noise(batch_size, z_dim)
                 _, d_loss = sess.run([disc_opt, disc_loss], feed_dict={x: data, y: label})
                 _, g_loss = sess.run([gen_opt, gen_loss], feed_dict={y: label})
 
-            if i % 1 == 0:
+            if i % 20 == 0:
                 print("\nEpoch - {}".format(i))
                 print("Discriminator Loss - {}".format(d_loss))
                 print("Generator Loss - {}".format(g_loss))
@@ -231,9 +231,11 @@ with tf.device("/device:GPU:0"):
                 model_saver.save(sess, 'session/cgan_cnn_mnist_model', global_step=1000)
 
                 # Saving the images.
-                for ind, digit, image in enumerate(zip(label, sample_output)):
+                count = 0
+                for digit, image in zip(label, sample_output):
+                    count += 1
                     # image = expit(image)
                     image = image.reshape([28, 28]).astype('uint8')*255
                     img = Image.fromarray(image)
-                    img.save('image/' + str(digit) + '_' + str(ind)  + '.png')
+                    img.save('image/' + str(digit) + '_' + str(count)  + '.png')
 
