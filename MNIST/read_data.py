@@ -44,7 +44,7 @@ def read_data_csv():
     print("Size of training set - ", len(train_data))
 
     # Read testing data from csv.
-    df = pd.read_csv('data/mnist_test.csv')
+    df = pd.read_csv('data/mnist_train.csv')
     test_label = df.label
     df = df.drop(['label'], axis = 1)
     test_data = df.values

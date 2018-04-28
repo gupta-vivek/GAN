@@ -17,7 +17,7 @@ import numpy as np
 from scipy.special import expit
 from PIL import Image
 import datetime
-import read_data
+from MNIST import read_data
 
 out_shape = None
 # Sample noise.

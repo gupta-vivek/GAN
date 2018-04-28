@@ -9,7 +9,7 @@ Sphinx Documentation Status:
 """
 
 import tensorflow as tf
-import read_data
+from MNIST import read_data
 import numpy as np
 from PIL import Image
 import datetime
