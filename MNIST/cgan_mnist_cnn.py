@@ -37,7 +37,7 @@ with tf.name_scope("discriminator"):
                 'wc1': tf.get_variable('d_wc1', [5, 5, 1, 32], initializer=tf.truncated_normal_initializer()),
                 'wc2': tf.get_variable('d_wc2', [5, 5, 32, 64], initializer=tf.truncated_normal_initializer()),
                 'wf1': tf.get_variable('d_wf1', [7 * 7 * 64, 1024], initializer=tf.truncated_normal_initializer()),
-                'out': tf.get_variable('d_wout', [1024, 10], initializer=tf.truncated_normal_initializer())
+                'out': tf.get_variable('d_wout', [1024, 11], initializer=tf.truncated_normal_initializer())
             }
 
             # Biases.
@@ -45,7 +45,7 @@ with tf.name_scope("discriminator"):
                 'bc1': tf.get_variable('d_bc1', [32], initializer=tf.truncated_normal_initializer()),
                 'bc2': tf.get_variable('d_bc2', [64], initializer=tf.truncated_normal_initializer()),
                 'bf1': tf.get_variable('d_bf1', [1024], initializer=tf.truncated_normal_initializer()),
-                'out': tf.get_variable('d_bout', [10], initializer=tf.truncated_normal_initializer())
+                'out': tf.get_variable('d_bout', [11], initializer=tf.truncated_normal_initializer())
             }
 
             # Layer 1.
@@ -76,7 +76,7 @@ with tf.name_scope("discriminator"):
 with tf.name_scope("Generator"):
     def generator(y, z_dim):
         gen_weights = {
-            'w0': tf.get_variable('g_wo', [10, z_dim], dtype=tf.float32, initializer=tf.truncated_normal_initializer()),
+            'w0': tf.get_variable('g_wo', [11, z_dim], dtype=tf.float32, initializer=tf.truncated_normal_initializer()),
             'w1': tf.get_variable('g_w1', [z_dim, 3136], dtype=tf.float32, initializer=tf.truncated_normal_initializer()),
             'wc1': tf.get_variable('g_w2', [3, 3, 1, z_dim/2], dtype=tf.float32, initializer=tf.truncated_normal_initializer()),
             'wc2': tf.get_variable('g_w3', [3, 3, z_dim/2, z_dim/4], dtype=tf.float32,
@@ -129,11 +129,12 @@ z_dim = 100
 train_data, train_label, test_data, test_label = read_data.read_data_csv()
 train_data = read_data.divide_batches(train_data, batch_size)
 train_label = read_data.divide_batches(train_label, batch_size)
+print(train_label)
 
 # Place holders.
 with tf.name_scope("placeholders"):
     x = tf.placeholder(tf.float32, shape=[None, 784], name="discriminator_placeholder")
-    y = tf.placeholder(tf.float32, shape=[None, 10], name="discriminator_output")
+    y = tf.placeholder(tf.float32, shape=[None, 11], name="discriminator_output")
     # z = tf.placeholder(tf.float32, shape=[None, 100], name="generator_placeholder")
 
 # Learning rate
@@ -151,11 +152,14 @@ gen_vars = [var for var in tvars if 'g_' in var.name]
 # Loss.
 disc_loss = None
 gen_loss = None
+temp_label = []
+for i in range(batch_size):
+    temp_label.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
 
 with tf.name_scope("loss"):
     if LOSS_1:
         disc_loss_real = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=disc_real, labels=y), name="disc_fake_loss")
-        disc_loss_fake = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=disc_fake, labels=y), name="disc_real_loss")
+        disc_loss_fake = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=disc_fake, labels=temp_label), name="disc_real_loss")
         disc_loss = disc_loss_fake + disc_loss_real
         gen_loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=disc_fake, labels=y), name="gen_loss")
 

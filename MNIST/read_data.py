@@ -51,7 +51,7 @@ def read_data_csv():
     print("Size of testing set - ", len(test_data))
 
     # Convert labels to one hot vector.
-    train_label_1 = one_hot_vector(train_label, 10)
+    train_label_1 = one_hot_vector(train_label, 11)
     test_label_1 = one_hot_vector(test_label, 10)
 
     return train_data, train_label_1, test_data, test_label_1
